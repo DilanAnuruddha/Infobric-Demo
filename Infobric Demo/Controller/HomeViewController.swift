@@ -9,7 +9,7 @@ import UIKit
 
 class HomeViewController: UIViewController {
     var galleryViewModels = [GalleryViewModel]()
-    let cellId = "cellId"
+    let galleryCellId = "galleryCellId"
     
     let gallery: UICollectionView =  {
         let layout = UICollectionViewFlowLayout()
@@ -21,6 +21,14 @@ class HomeViewController: UIViewController {
         return cv
     }()
     
+    let emptyView:EmptyBackgroundView = {
+        let ebv = EmptyBackgroundView()
+        ebv.imgView.image = UIImage(systemName: "photo.on.rectangle.angled")
+        ebv.lblHeader.text = "No Photos"
+        ebv.lblDescription.text = "There are no photos found."
+        return ebv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -29,6 +37,7 @@ class HomeViewController: UIViewController {
         setupView()
         fetchData()
     }
+    
     
     //Setup UI
     func setupView(){
@@ -41,7 +50,7 @@ class HomeViewController: UIViewController {
             gallery.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
         
-        gallery.register(GalleryCell.self, forCellWithReuseIdentifier: cellId)
+        gallery.register(GalleryCell.self, forCellWithReuseIdentifier: galleryCellId)
         gallery.delegate = self
         gallery.dataSource = self
     }
@@ -52,11 +61,12 @@ class HomeViewController: UIViewController {
 // MARK: Delegates
 extension HomeViewController : UICollectionViewDataSource, UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        gallery.backgroundView = galleryViewModels.count == 0 ? emptyView : nil
         return galleryViewModels.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GalleryCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: galleryCellId, for: indexPath) as! GalleryCell
         cell.galleryViewModel = galleryViewModels[indexPath.row]
         return cell
     }
@@ -80,6 +90,8 @@ extension HomeViewController : UICollectionViewDataSource, UICollectionViewDeleg
 
 //MARK: Functions
 extension HomeViewController {
+    
+    //Fetch photos from API
     fileprivate func fetchData() {
         if CheckConnection.isConnected() {
             Service.shared.fetchImages { [weak self] (photos, err) in
@@ -91,7 +103,6 @@ extension HomeViewController {
                 self?.galleryViewModels += photos?.map({return GalleryViewModel(photo: $0)}) ?? []
                 self?.gallery.reloadData()
             }
-            
         }else{
             Alert.showNoConnectionAlert(on: self)
         }
