@@ -28,7 +28,6 @@ class Service {
                 return
             }
             
-            
             guard let data = data else { return }
             do {
                 let photos = try JSONDecoder().decode([Photo].self, from: data)

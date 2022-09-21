@@ -8,7 +8,6 @@
 import UIKit
 
 class DetailViewController: UIViewController {
-
     var galleryViewModel:GalleryViewModel!
     
     //MARK: Components
@@ -49,6 +48,10 @@ class DetailViewController: UIViewController {
         loadData()
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        
+    }
+    
     func setupView(){
         view.addSubViews(imgMain,imgAuthor,lblAuthorName,lblAuthorBio)
         
@@ -77,7 +80,7 @@ class DetailViewController: UIViewController {
     
     //load data to the relavant fields
     func loadData(){
-        imgMain.loadImageUsingCache(galleryViewModel?.urls.full ?? "")
+        imgMain.loadImageUsingCache(galleryViewModel?.urls.regular ?? "")
         imgAuthor.loadImageUsingCache(galleryViewModel?.user.profileImage.small ?? "")
         lblAuthorName.text = "\(galleryViewModel?.user.firstName ?? "") \(galleryViewModel?.user.lastName ?? "")"
         lblAuthorBio.text = galleryViewModel?.user.bio ?? "N/A"

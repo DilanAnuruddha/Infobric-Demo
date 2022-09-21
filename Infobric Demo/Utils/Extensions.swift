@@ -20,8 +20,8 @@ extension UIView {
 }
 
 //MARK: UIImageView
-let imageCache = NSCache<NSString, AnyObject>()
 
+let imageCache = NSCache<NSString, AnyObject>()
 extension UIImageView {
     func loadImageUsingCache(_ urlString: String) {
         let activityIndicator = UIActivityIndicatorView()
@@ -50,6 +50,7 @@ extension UIImageView {
             DispatchQueue.main.async(execute: {
                 if let downloadedImage = UIImage(data: data!) {
                     imageCache.setObject(downloadedImage, forKey: urlString as NSString)
+                    imageCache.countLimit = 50
                     self.image = downloadedImage
                     activityIndicator.stopAnimating()
                 }
